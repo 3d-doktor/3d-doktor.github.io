@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Runner Rush</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <h1>Runner Rush</h1>
+    <p class="subtitle">Ein Endless-Runner im Stil von Subway Surfers (mit einfachen Blöcken).</p>
+
+    <section class="hud">
+      <div>Punkte: <span id="score">0</span></div>
+      <div>Bestwert: <span id="highscore">0</span></div>
+      <div>Tempo: <span id="speed">1.0x</span></div>
+    </section>
+
+    <canvas id="game" width="900" height="500" aria-label="Runner Rush Spielfeld"></canvas>
+
+    <section class="controls">
+      <p><strong>Steuerung:</strong> ◀ ▶ zum Spurwechsel, ▲ zum Springen, ▼ zum Sliden, <kbd>R</kbd> Neustart.</p>
+      <p>Touch: Wische links/rechts/hoch/runter auf dem Spielfeld.</p>
+    </section>
+
+    <button id="startButton">Start / Neustart</button>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
