@@ -4,6 +4,7 @@ const scoreEl = document.getElementById('score');
 const highscoreEl = document.getElementById('highscore');
 const speedEl = document.getElementById('speed');
 const startButton = document.getElementById('startButton');
+const fullscreenButton = document.getElementById('fullscreenButton');
 
 const LANES = [260, 450, 640];
 const PLAYER_Z = 80;
@@ -25,6 +26,7 @@ const state = {
   slideMs: 0,
   distance: 0,
   lastSpawn: 0,
+  nextSpawnDistance: 120,
   obstacles: [],
   coins: [],
   lastTimestamp: 0,
@@ -42,6 +44,7 @@ function resetGame() {
   state.slideMs = 0;
   state.distance = 0;
   state.lastSpawn = 0;
+  state.nextSpawnDistance = 120;
   state.obstacles = [];
   state.coins = [];
   state.lastTimestamp = performance.now();
@@ -51,6 +54,7 @@ function resetGame() {
 
 function spawnChunk() {
   state.lastSpawn = state.distance;
+  state.nextSpawnDistance = 140 + Math.random() * 80;
   const spawnZ = 1100 + Math.random() * 250;
   const pattern = Math.random();
 
@@ -101,7 +105,7 @@ function update(dtMs) {
     state.slideMs -= dt;
   }
 
-  if (state.distance - state.lastSpawn > 220) {
+  if (state.distance - state.lastSpawn > state.nextSpawnDistance) {
     spawnChunk();
   }
 
@@ -150,6 +154,27 @@ function update(dtMs) {
   state.score += Math.floor(dt * state.speed * 0.12);
   scoreEl.textContent = String(state.score);
   speedEl.textContent = `${(state.speed / 0.35).toFixed(1)}x`;
+}
+
+
+function resizeCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  const width = Math.max(900, Math.round(rect.width * dpr));
+  const height = Math.max(500, Math.round(rect.height * dpr));
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  }
+}
+
+async function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    await document.documentElement.requestFullscreen();
+  } else {
+    await document.exitFullscreen();
+  }
+  resizeCanvas();
 }
 
 function projectPoint(x, y, z) {
@@ -271,15 +296,18 @@ function drawOverlay() {
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawTrack();
-  state.obstacles
-    .slice()
-    .sort((a, b) => b.z - a.z)
-    .forEach(drawObstacle);
-  state.coins
-    .slice()
-    .sort((a, b) => b.z - a.z)
-    .forEach(drawCoin);
+
+  const sortedObstacles = state.obstacles.slice().sort((a, b) => b.z - a.z);
+  const sortedCoins = state.coins.slice().sort((a, b) => b.z - a.z);
+
+  sortedObstacles.filter((obstacle) => obstacle.z - state.distance > PLAYER_Z).forEach(drawObstacle);
+  sortedCoins.filter((coin) => coin.z - state.distance > PLAYER_Z).forEach(drawCoin);
+
   drawPlayer();
+
+  sortedObstacles.filter((obstacle) => obstacle.z - state.distance <= PLAYER_Z).forEach(drawObstacle);
+  sortedCoins.filter((coin) => coin.z - state.distance <= PLAYER_Z).forEach(drawCoin);
+
   drawOverlay();
 }
 
@@ -357,8 +385,13 @@ canvas.addEventListener('touchend', (event) => {
 });
 
 window.addEventListener('keydown', handleKey);
+window.addEventListener('resize', resizeCanvas);
 startButton.addEventListener('click', resetGame);
+fullscreenButton.addEventListener('click', () => {
+  toggleFullscreen().catch(() => {});
+});
 
+resizeCanvas();
 resetGame();
 render();
 requestAnimationFrame(gameLoop);

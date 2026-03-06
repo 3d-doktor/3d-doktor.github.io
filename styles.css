@@ -1,7 +1,7 @@
 :root {
   color-scheme: dark;
-  --bg: #0c1220;
-  --panel: #121d33;
+  --bg: #050a16;
+  --panel: #101a30;
   --accent: #48d1cc;
   --text: #f2f7ff;
   --danger: #ff4b4b;
@@ -13,25 +13,33 @@
 
 body {
   margin: 0;
-  background: radial-gradient(circle at top, #142341, var(--bg));
+  background: radial-gradient(circle at top, #1f335d, var(--bg));
   color: var(--text);
   font-family: Inter, system-ui, Arial, sans-serif;
   min-height: 100vh;
 }
 
 .app {
-  max-width: 980px;
+  width: min(1200px, 100vw);
   margin: 0 auto;
   padding: 1rem;
   text-align: center;
 }
 
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  text-align: left;
+}
+
 h1 {
-  margin-bottom: 0.4rem;
+  margin: 0 0 0.2rem;
 }
 
 .subtitle {
-  margin-top: 0;
+  margin: 0;
   opacity: 0.85;
 }
 
@@ -49,11 +57,10 @@ h1 {
 
 #game {
   width: 100%;
-  height: auto;
-  max-height: 72vh;
+  height: min(78vh, calc(100vw * 0.62));
   border-radius: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  background: linear-gradient(#1a2d53 0%, #091021 58%);
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  background: linear-gradient(#223f74 0%, #0a1326 58%);
   touch-action: none;
 }
 
@@ -69,7 +76,8 @@ kbd {
   border-radius: 5px;
 }
 
-#startButton {
+#startButton,
+#fullscreenButton {
   background: var(--accent);
   color: #041213;
   border: 0;
@@ -80,6 +88,26 @@ kbd {
   cursor: pointer;
 }
 
-#startButton:hover {
+#fullscreenButton {
+  white-space: nowrap;
+}
+
+#startButton:hover,
+#fullscreenButton:hover {
   filter: brightness(1.08);
+}
+
+:fullscreen .app {
+  width: 100vw;
+  max-width: none;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto auto;
+  gap: 0.7rem;
+  padding: 0.9rem;
+}
+
+:fullscreen #game {
+  height: 100%;
+  max-height: none;
 }
